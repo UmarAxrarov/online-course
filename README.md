@@ -30,14 +30,21 @@ Course qoyihs va uni organish
     - name
     - email
     - password
+    - role
+    - imageUrl
+    - likes
 1. Ustoz:
     - id
     - name
     - email
     - password
     - tel_number
+    - imageUrl
+    - role
+    - courses
 4. Course:
     - id
+    - teacher_id
     - video or img
     - title
     - content
@@ -45,13 +52,14 @@ Course qoyihs va uni organish
 5. Likes:
     - id
     - course_id
+    - user_id
 
 /->    Home page
 /login    -> Login
 /register  -> Register
 /forgot -> Forgot password
-/reset -> Reset password
 /delete -> delete account
 /profile -> user and teacher
 /profile/likes  -> User likes
 /profile/courses -> Teacher courses
+?query -> reset like curs

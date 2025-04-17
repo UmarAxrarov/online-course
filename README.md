@@ -14,7 +14,6 @@ Course qoyihs va uni organish
 - Ustoz accaunt tikla olishi kerak.
 - Foydalanuvchi curs kora olishi va uni saqla olishi kerak.
 - Foydalanuvchi saqlangan cursni ochira olishi kerak olishi kerak.
-- Foydalanuvchi curs kora olishi va uni saqla olishi kerak.
 - Ustoz curs kora olishi va qosha olishi kerak.
 - Ustoz curs ochira olishi kerak olishi kerak.
 

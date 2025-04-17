@@ -1,14 +1,14 @@
 import userModel from "./user.model.js";
 // JS
-class User {
+class UserService {
     #_service;
     constructor() {
         this.#_service = userModel;
     }
     getUser = async (id) => {
-        const user = await this.#_service.findById({id}).populate("likes");
+        const findUser = await this.#_service.findOne({id}).populate("likes");
         return {
-            user,
+            findUser,
         }
     }
     createUser = async (name,email,hashPassword) => {
@@ -21,5 +21,18 @@ class User {
             newUser,
         }
     }
-    updateUser
+    updateUser = async (name,email,password,imageUrl) => {
+        const updatedUser = await this.#_service.findByIdAndUpdate(
+            {name},
+            {$set: {email,password,imageUrl}},
+        )
+        return {
+            updatedUser,
+        }
+    }
+    deleteUser = async (id) => {
+        await this.#_service.findByIdAndDelete({id});
+        return {};
+    }
 }
+export default new UserService();

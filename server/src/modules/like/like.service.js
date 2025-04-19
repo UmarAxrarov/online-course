@@ -11,11 +11,11 @@ class LikeService {
             curs:cursId,
         });
         await newLike.save();
-        return {};
+        return newLike;
     }
     deleteLike = async (id) => {
         await this.#_service.findByIdAndDelete({id});
-        return {}
+        return;
     }
 }
 export default new LikeService();

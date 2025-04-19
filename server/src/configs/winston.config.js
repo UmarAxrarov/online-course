@@ -1,7 +1,7 @@
 import winston from "winston";
 import path from "path";
 // JS
-const logDir = path.join(process.cwd(), "..", "logs");
+const logDir = path.join(process.cwd(),"logs");
 const logger_error = winston.createLogger({
     level: "error",
     format: winston.format.combine(
@@ -9,7 +9,7 @@ const logger_error = winston.createLogger({
         winston.format.json()
     ),
     transports: [
-        new winston.transports.Console({ level: "error"}),
+        // new winston.transports.Console({ level: "error"}),
         new winston.transports.File({ filename: path.join(logDir, "errors.log")}),
     ]
 });

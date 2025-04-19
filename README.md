@@ -27,17 +27,17 @@ Course qoyihs va uni organish
 1. Foydalanuvchi:
     - id
     - name
-    - email
+    - email (UNIQUE)
     - password
     - role
     - imageUrl
     - likes
-1. Ustoz:
+2. Ustoz:
     - id
     - name
     - email
-    - password
-    - tel_number
+    - password (UNIQUE)
+    - tel_number (UNIQUE)
     - imageUrl
     - role
     - courses
@@ -56,6 +56,7 @@ Course qoyihs va uni organish
 /->    Home page
 /login    -> Login
 /register  -> Register
+/update  -> update
 /forgot -> Forgot password
 /delete -> delete account
 /profile -> user and teacher

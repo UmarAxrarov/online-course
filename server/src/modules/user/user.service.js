@@ -6,33 +6,41 @@ class UserService {
         this.#_service = userModel;
     }
     getUser = async (id) => {
-        const findUser = await this.#_service.findOne({id}).populate("likes");
-        return {
-            findUser,
-        }
+        // const findUser = await this.#_service.findById({_id:id}).populate({
+        //     path: "likes",
+        //     populate: {
+        //         path: "curs",
+        //     }
+        // })
+        const findUser = await this.#_service.findById({_id:id}).populate({
+            path: "likes",
+            select: "-_id user curs",
+        })
+        return findUser;
     }
-    createUser = async (name,email,hashPassword) => {
+    createUser = async (name,email,password) => {
         const newUser = await this.#_service.create({
             name,
             email,
-            password:hashPassword
+            password
         })
-        return {
-            newUser,
-        }
+        return newUser;
     }
-    updateUser = async (name,email,password,imageUrl) => {
+    updateUser = async (id,data) => {
         const updatedUser = await this.#_service.findByIdAndUpdate(
-            {name},
-            {$set: {email,password,imageUrl}},
+            {_id:id},
+            {$set: {...data}},
+            {new: true}
         )
-        return {
-            updatedUser,
-        }
+        return updatedUser;
     }
     deleteUser = async (id) => {
-        await this.#_service.findByIdAndDelete({id});
-        return {};
+        await this.#_service.findByIdAndDelete({_id:id});
+        return 1;
+    }
+    findUser = async (email) => {
+        const user = await this.#_service.findOne({email});
+        return user;
     }
 }
 export default new UserService();

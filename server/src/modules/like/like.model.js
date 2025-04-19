@@ -11,5 +11,8 @@ const likeSchema = new mongoose.Schema({
         ref: "Course",
         required: true,
     }
+}, {
+    collection: "likes",
 })
 export default mongoose.model("Like", likeSchema);
+ 

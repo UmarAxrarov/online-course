@@ -8,14 +8,25 @@ function dbDubKeyError(error) {
     }
     return error
 }
+function dbSelectUndefinedError(error) {
+    if(error.code === 31254) {
+        error.status = 404
+        error.isException = true;
+        error.message = `Ushbu: "select berilgan paramet databasada mavjud emas"`;
+    }
+    return error
+}
 export const global_errors_middleware = (error,_,res,__) => {
-    logger.logger_error.error(error?.code,error.message)    
+    logger.logger_error.error(error.message)    
     error = dbDubKeyError(error);
+    error = dbSelectUndefinedError(error);
     if(error.isException) {
         return res.status(error.status).send({
             message: error.message,
+            errorType: error.errorType,
         })
     }
+    console.log(error);
     return res.status(500).send({
         message: "Server error",
     })

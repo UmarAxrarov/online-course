@@ -5,6 +5,8 @@ import { requset_errors } from "../exceptions/requset-errors.js";
 let uploadsFile = join(process.cwd(), "uploads");
 const storage = multer.diskStorage({
     destination: (req,file,cb) => {
+        // console.log(true);
+        // console.log(join(process.cwd(),"uploads", "images"))
         if(file.mimetype.split("/")[0] === "image") {
             uploadsFile = join(process.cwd(),"uploads", "images");
         }
@@ -19,13 +21,13 @@ const storage = multer.diskStorage({
 })
 function fileFilterImage(req,file,cb) {
     if(!file.mimetype.startsWith("image/")) {
-        return cb(new requset_errors("Faqat Rasm yuklash mumkun", 400));
+        return cb(new requset_errors("Faqat Rasm yuklash mumkun", 400,"MULTER"));
     }
     cb(null,true);
 }
 function fileFilter(req,file,cb) {
     if(!(file.mimetype.startsWith("image/")  || file.mimetype.startsWith("video/"))) {
-        return cb(new requset_errors("Faqat Rasm yoki video yuklash mumkun", 400));
+        return cb(new requset_errors("Faqat Rasm yoki video yuklash mumkun", 400,"MULTER"));
     }
     cb(null,true);
 }

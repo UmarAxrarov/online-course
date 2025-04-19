@@ -14,15 +14,11 @@ class TeacherService {
                 limit: limit,
             }
         })
-        return {
-            teachers,
-        }
-    }
+        return teachers;
+    }  // for home
     getTeacher = async (id) => {
         const findTeacher = await this.#_service.findOne({id}).populate("courses");
-        return {
-            findTeacher,
-        }
+        return findTeacher
     }
     createTeacher = async (name,email,password,tel_number) => {
         const newTeacher = await this.#_service.create({
@@ -31,9 +27,7 @@ class TeacherService {
             password,
             tel_number
         })
-        return {
-            newTeacher,
-        }
+        return newTeacher;
     }
     updateTeacher = async (id,name,email,password,imageUrl,tel_number) => {
         const updatedTeacher = await this.#_service.findByIdAndUpdate(
@@ -41,12 +35,10 @@ class TeacherService {
             {$set: {name,email,password,imageUrl,tel_number}},
             {new:true},
         )
-        return {
-            updatedTeacher,
-        }
+        return updatedTeacher;
     }
     deleteUser = async (id) => {
         await this.#_service.findByIdAndDelete({id});
-        return {};
+        return 1;
     }
 }

@@ -31,7 +31,10 @@ const teacherSchema = new mongoose.Schema({
     courses: [{
         type: mongoose.SchemaTypes.ObjectId,
         ref: "Course",
-    }]
+    }],
+    token: {
+      type: mongoose.SchemaTypes.String,
+    }
 }, {
     collection: "teachers",
     timestamps: true,

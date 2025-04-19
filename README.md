@@ -32,6 +32,7 @@ Course qoyihs va uni organish
     - role
     - imageUrl
     - likes
+    - token
 2. Ustoz:
     - id
     - name
@@ -41,6 +42,7 @@ Course qoyihs va uni organish
     - imageUrl
     - role
     - courses
+    - token
 4. Course:
     - id
     - teacher_id

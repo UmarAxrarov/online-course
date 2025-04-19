@@ -17,7 +17,7 @@ class UserService {
             select: "-_id user curs",
         })
         return findUser;
-    }
+    } // for home
     createUser = async (name,email,password) => {
         const newUser = await this.#_service.create({
             name,
@@ -31,15 +31,15 @@ class UserService {
             {_id:id},
             {$set: {...data}},
             {new: true}
-        )
+        ).select("-_id name email password")
         return updatedUser;
     }
     deleteUser = async (id) => {
         await this.#_service.findByIdAndDelete({_id:id});
         return 1;
     }
-    findUser = async (email) => {
-        const user = await this.#_service.findOne({email});
+    findUser = async (data) => {
+        const user = await this.#_service.findOne({...data});
         return user;
     }
 }

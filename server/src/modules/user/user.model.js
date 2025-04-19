@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { ROLES } from "../../constants/role.constant.js";
 import { port } from "../../configs/port.config.js";
+import { type } from "node:os";
 // JS
 const userSchema = new mongoose.Schema(
   {
@@ -32,6 +33,9 @@ const userSchema = new mongoose.Schema(
         ref: "Like",
       },
     ],
+    token: {
+      type: mongoose.SchemaTypes.String,
+    }
   },
   {
     collection: "users",

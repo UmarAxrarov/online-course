@@ -1,5 +1,6 @@
 import { isValidObjectId } from "mongoose";
 import { hash, compare } from "bcrypt";
+import crypto from "node:crypto";
 import userService from "./user.service.js";
 import { requset_errors } from "../../exceptions/requset-errors.js";
 import jwt from "jsonwebtoken";
@@ -25,7 +26,7 @@ class UserController {
             }
             const user = await this.#_service.getUser(id);
             if(!user) {
-                throw new requset_errors("id hato berild",404, "CONTROLLER");
+                throw new requset_errors("user topilmadi",404, "CONTROLLER");
             }
             res.status(200).send({
                 message: "Success ✅",
@@ -39,7 +40,7 @@ class UserController {
         try {
             const {name,email} = req.body;
             let {password} = req.body;
-            const findUser = await this.#_service.findUser(email);
+            const findUser = await this.#_service.findUser({email});
             if(findUser) {
                 throw new requset_errors("munaqa foydalanuvhci bor",409, "CONTROLLER");
             }
@@ -71,7 +72,7 @@ class UserController {
     login = async (req,res,next) => {
         try {
             const {email,password} = req.body;
-            const findUser = await this.#_service.findUser(email);
+            const findUser = await this.#_service.findUser({email});
             if(!findUser) {
                 throw new requset_errors("email topilmadi",404,"CONTROLLER");
             }
@@ -99,11 +100,16 @@ class UserController {
     }
     update = async (req,res,next) => {
         try {
-            const {name,password} = req.body;
+            const {name} = req.body;
+            let {password} = req.body
             const id = req.id;
-            const imageUrl = `images/${req.file.filename}`;
+            const imageUrl = `images/${req?.file?.filename}`;
             if(!isValidObjectId(id)) {
                 throw new requset_errors("id hato beildi",400, "CONTROLLER");
+            }
+            const findUser = await this.#_service.findUser({_id:id});
+            if(!findUser) {
+                throw new requset_errors("munaqa user yoq",404, "CONTROLLER"); 
             }
             const cheking = {
                 name,
@@ -113,6 +119,7 @@ class UserController {
             const checked = Object.fromEntries(
                 Object.entries(cheking).filter(([_, value]) => value !== undefined)
             );
+            checked.password = await hash(checked.password,5);
             const updatedUser = await this.#_service.updateUser(id,checked);
             res.status(202).send({
                 message: "Success ✅",
@@ -128,16 +135,56 @@ class UserController {
             if(!isValidObjectId(id)) {
                 throw new requset_errors("id hato berild",400, "CONTROLLER");
             }
-            const deletedUser = await this.#_service.deleteUser(id)
-            if(!deletedUser) {
-                throw new requset_errors("munaqa user yoq",404, "CONTROLLER");
+            const findUser = await this.#_service.findUser({_id:id});
+            if(!findUser) {
+                throw new requset_errors("munaqa user yoq",404, "CONTROLLER"); 
             }
-            const likes = await likeModel.find({user:id});
-            console.log("likes",likes);
+            await this.#_service.deleteUser(id)
             await likeModel.deleteMany({user:id});
             res.send(204).end();
         } catch (error) {
             next(error)
+        }
+    }
+    forgotPassword = async (req,res,next) => {
+        try {
+            const {email} = req.body;
+            const findUser = await this.#_service.findUser({email});
+            if(!findUser) {
+                throw new requset_errors("email topilmadi",404,"CONTROLLER");
+            }
+            const token = crypto.randomBytes(20).toString("hex");
+            findUser.token = token;
+            await findUser.save();
+            sendGmail({
+                to:email,
+                subject: "res password",
+                html: `<p>${token}</p>`,
+            })
+            console.log(token);
+            res.status(200).send({
+                message: "email tekshiring",
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+    resetPassword = async (req,res,next) => {
+        try {
+            let {password} = req.body;
+            const {token} = req.query;
+            const findUser = await this.#_service.findUser({token});
+            if(!findUser) {
+                throw new requset_errors("foydalanuvhci topilmadi",404,"CONTROLLER");
+            }
+            password = await hash(password,5);
+            const resetPassword = await this.#_service.updateUser(findUser._id,{password});
+            res.status(200).send({
+                message:"✅ qayata login qiling",
+                data: resetPassword,
+            })
+        } catch (error) {
+            next(error);
         }
     }
 }

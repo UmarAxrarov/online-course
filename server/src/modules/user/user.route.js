@@ -1,6 +1,6 @@
 import {Router} from "express";
 import { validation } from "../../middlewares/validation.middleware.js";
-import { clientLogin, userRegister, userUpdate } from "../dtos/schemas.js";
+import { clientForgot, clientLogin, clientReset, userRegister, userUpdate } from "../dtos/schemas.js";
 import userController from "./user.controller.js";
 import authMiddleware from "../../middlewares/auth.middleware.js";
 import { checkRole } from "../../middlewares/check-role.middleware.js";
@@ -39,5 +39,17 @@ userRoute
    authMiddleware.checkRefreshToken(true),
    checkRole("USER"),
    userController.deleteUser
+ )
+ .post("/forgot",
+  authMiddleware.checkAccessToken(false),
+  authMiddleware.checkRefreshToken(false),
+  validation(clientForgot),
+  userController.forgotPassword
+ )
+ .post("/reset",
+  authMiddleware.checkAccessToken(false),
+  authMiddleware.checkRefreshToken(false),
+  validation(clientReset),
+  userController.resetPassword
  )
 export default userRoute;

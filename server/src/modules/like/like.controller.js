@@ -28,5 +28,23 @@ class LikeController {
             next(error);
         }
     }
+    unLike = async (req, res, next) => {
+        try {
+            const { id } = req.query;
+            const findLike = await this.#_service.findLike(id);
+            if (!findLike) {
+                throw new requset_errors("Like topilmadi", 400, "CONTROLLER");
+            }
+            await this.#_service.deleteLike(id);
+            await userModel.findByIdAndUpdate(findLike.user, {
+                $pull: {
+                    likes: id,
+                },
+            });
+            res.status(204).send();
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 export default new LikeController();

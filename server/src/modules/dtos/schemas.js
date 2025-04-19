@@ -22,6 +22,12 @@ export const clientLogin = Joi.object({
     email: Joi.string().required(),
     password: Joi.string().required(),  
 }).required();
+export const clientForgot = Joi.object({
+    email: Joi.string().required(),
+}).required();
+export const clientReset = Joi.object({
+    password: Joi.string().required(),
+}).required();
 
 export const filter = Joi.object({
     sortY: Joi.number().valid(0,1).default(0),

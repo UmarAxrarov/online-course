@@ -8,6 +8,9 @@ export const checkRole = (role) => {
             if(!Object.values(ROLES).includes(clinet_role)) {
                 throw new requset_errors("register yoki login qiling",404, "ROLE");
             }
+            if(!Object.values(ROLES).includes(role)) {
+                throw new requset_errors("rol mavjud emas",404, "ROLE");
+            }
             if(clinet_role !== role) {
                 throw new requset_errors("bu amalni bajarishga haqingiz yoq",403,"ROLE");
             }

@@ -1,55 +1,55 @@
 import {Router} from "express";
 import { validation } from "../../middlewares/validation.middleware.js";
-import { clientForgot, clientLogin, clientReset, clientUpdate, userRegister } from "../dtos/schemas.js";
-import userController from "./user.controller.js";
 import authMiddleware from "../../middlewares/auth.middleware.js";
 import { checkRole } from "../../middlewares/check-role.middleware.js";
 import multerConfig from "../../configs/multer.config.js";
+import teacherController from "./teacher.controller.js";
+import { clientForgot, clientLogin, clientReset, clientUpdate, teacherRegister } from "../dtos/schemas.js";
 // JS
-const userRoute = Router();
-userRoute
+const teacherRoute = Router();
+teacherRoute
  .get("/", 
     authMiddleware.checkAccessToken(true),
     authMiddleware.checkRefreshToken(true),
-    checkRole("USER"),
-    userController.getUser
+    checkRole("TEACHER"),
+    teacherController.getTeacher
  )
  .post("/register",
     authMiddleware.checkAccessToken(false),
     authMiddleware.checkRefreshToken(false),
-    validation(userRegister), 
-    userController.register
+    validation(teacherRegister), 
+    teacherController.register
  )
  .post("/login",
    authMiddleware.checkAccessToken(false),
    authMiddleware.checkRefreshToken(false),
    validation(clientLogin),
-   userController.login
+   teacherController.login
  )
  .post("/update",
    authMiddleware.checkAccessToken(true),
    authMiddleware.checkRefreshToken(true),
-   checkRole("USER"),
+   checkRole("TEACHER"),
    multerConfig.uploadOnlyImage.single("imageUrl"),
    validation(clientUpdate),
-   userController.update
+   teacherController.update
  )
  .post("/delete",
    authMiddleware.checkAccessToken(true),
    authMiddleware.checkRefreshToken(true),
-   checkRole("USER"),
-   userController.deleteUser
+   checkRole("TEACHER"),
+   teacherController.deleteTeacher
  )
  .post("/forgot",
   authMiddleware.checkAccessToken(false),
   authMiddleware.checkRefreshToken(false),
   validation(clientForgot),
-  userController.forgotPassword
+  teacherController.forgotPassword
  )
  .post("/reset",
   authMiddleware.checkAccessToken(false),
   authMiddleware.checkRefreshToken(false),
   validation(clientReset),
-  userController.resetPassword
+  teacherController.resetPassword
  )
-export default userRoute;
+export default teacherRoute;

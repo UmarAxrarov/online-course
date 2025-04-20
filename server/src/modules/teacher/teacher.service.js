@@ -1,3 +1,4 @@
+import { count } from "node:console";
 import teacherModel from "./teacher.model.js";
 // JS
 class TeacherService {
@@ -5,40 +6,34 @@ class TeacherService {
     constructor() {
         this.#_service = teacherModel;
     }
-    getAllTeacher = async (sortY,limit,page) => {
-        const teachers = await this.#_service.find().populate({
-            path: "courses",
-            options: {
-                sort: {count: sortY},
-                skip: (page -1) * limit, 
-                limit: limit,
-            }
-        })
-        return teachers;
-    }  // for home
     getTeacher = async (id) => {
-        const findTeacher = await this.#_service.findOne({id}).populate("courses");
-        return findTeacher
+        const findTeacher = await this.#_service.findOne({_id:id}).select("_id").populate({
+            path: "courses",
+            select:"tel_number title content fileUrl",
+        });
+        return findTeacher;
     }
-    createTeacher = async (name,email,password,tel_number) => {
-        const newTeacher = await this.#_service.create({
-            name,
-            email,
-            password,
-            tel_number
-        })
+    createTeacher = async (data) => {
+        const newTeacher = await this.#_service.create({...data});
         return newTeacher;
     }
-    updateTeacher = async (id,name,email,password,imageUrl,tel_number) => {
+    updateTeacher = async (id,data) => {
         const updatedTeacher = await this.#_service.findByIdAndUpdate(
             {_id:id},
-            {$set: {name,email,password,imageUrl,tel_number}},
+            {$set: {...data}},
             {new:true},
-        )
+        ).select("-_id name email password tel_number");
         return updatedTeacher;
     }
-    deleteUser = async (id) => {
-        await this.#_service.findByIdAndDelete({id});
+    deleteTeacher = async (id) => {
+        await this.#_service.findByIdAndDelete({_id:id});
         return 1;
     }
+    findTeacher = async (data) => {
+        const teacher = await this.#_service.findOne({
+            $or:[{_id:data.id},{email: data.email},{tel_number: data.tel_number}, {token:data.token}],
+        });
+        return teacher;
+    }
 }
+export default new TeacherService();

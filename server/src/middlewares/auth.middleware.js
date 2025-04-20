@@ -22,7 +22,7 @@ class Auth {
                 req.role = "USER";
                 return next();
             }
-
+            
             try {
                 const decodeAceessToken = jwt.verify(accessToken, ACCESS_TOKEN_SECRET);
                 req.role = decodeAceessToken.role;
@@ -45,7 +45,7 @@ class Auth {
             }
         };
     }
-
+    
     checkRefreshToken(isCheck) {
         return (req, res, next) => {
             if (isCheck === false) {
@@ -73,12 +73,12 @@ class Auth {
                     REFRESH_TOKEN_SECRET,
                     { expiresIn: +REFRESH_TOKEN_EXPIRE_TIME }
                 );
-
+                
                 res.cookie("accessToken", newAccessToken, {
                     maxAge: +ACCESS_TOKEN_EXPIRE_TIME * 1000,
                     httpOnly: true,
                 });
-
+                
                 res.cookie("refreshToken", newRefreshToken, {
                     maxAge: +REFRESH_TOKEN_EXPIRE_TIME * 1000,
                     httpOnly: true,

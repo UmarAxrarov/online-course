@@ -5,30 +5,24 @@ class CourseService {
     constructor() {
         this.#_service = courseModel;
     }
-    createCourse = async (teacher_id,fileUrl,title,content,tel_number) => {
-        const newCourse = new this.#_service({
-            teacher: teacher_id,
-            fileUrl,
-            title,
-            content,
-            tel_number
-        })
+    createCourse = async (data) => {
+        const newCourse = new this.#_service({...data})
         await newCourse.save();
-        return {
-            newCourse,
-        }
+        return newCourse;
     }
-    updateCourse = async (id,fileUrl,title,content,tel_number,count) => {
+    updateCourse = async (id,data) => {
         const updatedCourse = await this.#_service.findByIdAndUpdate({_id:id},{
-            $set: {fileUrl,title,content,tel_number,count}
+            $set: {...data}
         }, {new: true});
-        return {
-            updatedCourse,
-        }
+        return updatedCourse;
     }
     deleteCourse = async (id) => {
-        await this.#_service.findByIdAndDelete({id});
-        return {};
+        await this.#_service.findByIdAndDelete(id);
+        return 1;
+    }
+    findCourse = async (id) => {
+        const findCourse = await this.#_service.findById(id);
+        return findCourse;
     }
 }
 export default new CourseService();

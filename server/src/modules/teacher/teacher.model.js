@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { ROLES } from "../../constants/role.constant.js";
+
 // JS
 const teacherSchema = new mongoose.Schema({
     name: {
@@ -21,7 +23,7 @@ const teacherSchema = new mongoose.Schema({
     },
     imageUrl: {
         type: mongoose.SchemaTypes.String,
-        default: `http://localhost:${port}/server/uploads/images/dafault-client-img.avif`,
+        default: `dafault-client-img.avif`,
     },
     role: {
         type: mongoose.SchemaTypes.String,

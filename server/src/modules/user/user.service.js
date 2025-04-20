@@ -6,16 +6,21 @@ class UserService {
         this.#_service = userModel;
     }
     getUser = async (id) => {
+        const findUser = await this.#_service.findById(id).populate({
+            path: "likes",
+            populate: {
+                path: "curs",
+                select: "-_id title content tel_number",
+                populate: {
+                    path: "teacher",
+                    select: "-_id name"
+                }
+            }
+        })
         // const findUser = await this.#_service.findById({_id:id}).populate({
         //     path: "likes",
-        //     populate: {
-        //         path: "curs",
-        //     }
+        //     select: "-_id user curs",
         // })
-        const findUser = await this.#_service.findById({_id:id}).populate({
-            path: "likes",
-            select: "-_id user curs",
-        })
         return findUser;
     } // for home
     createUser = async (name,email,password) => {

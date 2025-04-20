@@ -1,8 +1,9 @@
+import { requset_errors } from "../../exceptions/requset-errors.js";
+import courseModel from "../course/course.model.js";
+import teacherService from "./teacher.service.js";
 import { isValidObjectId } from "mongoose";
 import { hash, compare } from "bcrypt";
 import crypto from "node:crypto";
-import userService from "./user.service.js";
-import { requset_errors } from "../../exceptions/requset-errors.js";
 import jwt from "jsonwebtoken";
 import { 
     ACCESS_TOKEN_EXPIRE_TIME, 
@@ -10,46 +11,53 @@ import {
     REFRESH_TOKEN_EXPIRE_TIME, 
     REFRESH_TOKEN_SECRET } 
 from "../../configs/jwt.config.js";
-import { sendGmail } from "../../utils/email.util.js";
-import likeModel from "../like/like.model.js";
+import { sendGmail } from "../../utils/email.util.js"; 
 // JS
-class UserController {
+class TeacherController {
     #_service;
     constructor() {
-        this.#_service = userService;
+        this.#_service = teacherService;
     }
-    getUser = async (req,res,next) => {
-        try {
-            const id = req.id;
-            if(!isValidObjectId(id)) {
-                throw new requset_errors("id hato berild",400, "CONTROLLER");
+    getTeacher = async (req,res,next) => {
+            try {
+                const id = req.id;
+                if(!isValidObjectId(id)) {
+                    throw new requset_errors("id hato berild",400, "CONTROLLER");
+                }
+                const teacher = await this.#_service.getTeacher(id);
+                if(!teacher) {
+                    throw new requset_errors("teacher topilmadi",404, "CONTROLLER");
+                }
+                res.status(200).send({
+                    message: "Success ✅",
+                    data: teacher,
+                })
+            } catch (error) {
+                next(error);
             }
-            const user = await this.#_service.getUser(id);
-            if(!user) {
-                throw new requset_errors("user topilmadi",404, "CONTROLLER");
-            }
-            res.status(200).send({
-                message: "Success ✅",
-                data: user,
-            })
-        } catch (error) {
-            next(error);
-        }
     }
     register = async (req,res,next) => {
         try {
-            const {name,email} = req.body;
+            const {name,email,tel_number} = req.body;
             let {password} = req.body;
-            const findUser = await this.#_service.findUser({email});
-            if(findUser) {
+            const findTeacher = await this.#_service.findTeacher({email,tel_number});
+            const token = crypto.randomBytes(20).toString("hex");
+            if(findTeacher) {
                 throw new requset_errors("munaqa foydalanuvhci bor",409, "CONTROLLER");
             }
             password = await hash(password,5);
-            const newUser = await this.#_service.createUser(name,email,password);
-            const accessToken = jwt.sign({id:newUser._id,role:newUser.role}, ACCESS_TOKEN_SECRET, {
+            const data = {
+              name,
+              email,
+              password,
+              tel_number,
+              token 
+            }
+            const newTeacher = await this.#_service.createTeacher(data);
+            const accessToken = jwt.sign({id:newTeacher._id,role:newTeacher.role}, ACCESS_TOKEN_SECRET, {
                 expiresIn: ACCESS_TOKEN_EXPIRE_TIME,
             })
-            const refreshToken = jwt.sign({id:newUser._id,role:newUser.role}, REFRESH_TOKEN_SECRET, {
+            const refreshToken = jwt.sign({id:newTeacher._id,role:newTeacher.role}, REFRESH_TOKEN_SECRET, {
                 expiresIn: REFRESH_TOKEN_EXPIRE_TIME,
             })
             res.cookie("accessToken",accessToken);
@@ -61,7 +69,7 @@ class UserController {
             });
             res.status(201).send({
                 message:"Success ✅",
-                data: newUser,
+                data: newTeacher,
                 accessToken,
                 refreshToken
             });
@@ -72,25 +80,25 @@ class UserController {
     login = async (req,res,next) => {
         try {
             const {email,password} = req.body;
-            const findUser = await this.#_service.findUser({email});
-            if(!findUser) {
+            const findTeacher = await this.#_service.findTeacher({email});
+            if(!findTeacher) {
                 throw new requset_errors("email topilmadi",404,"CONTROLLER");
             }
-            const compareHashedPassword = await compare(password,findUser.password);
+            const compareHashedPassword = await compare(password,findTeacher.password);
             if(!compareHashedPassword) {
                 throw new requset_errors("parol hato kiritildi",404,"CONTROLLER");
             }
-            const accessToken = jwt.sign({id:findUser._id,role:findUser.role}, ACCESS_TOKEN_SECRET, {
+            const accessToken = jwt.sign({id:findTeacher._id,role:findTeacher.role}, ACCESS_TOKEN_SECRET, {
                 expiresIn: ACCESS_TOKEN_EXPIRE_TIME,
             })
-            const refreshToken = jwt.sign({id:findUser._id,role:findUser.role}, REFRESH_TOKEN_SECRET, {
+            const refreshToken = jwt.sign({id:findTeacher._id,role:findTeacher.role}, REFRESH_TOKEN_SECRET, {
                 expiresIn: REFRESH_TOKEN_EXPIRE_TIME,
             })
             res.cookie("accessToken",accessToken);
             res.cookie("refreshToken",refreshToken);
             res.status(200).send({
                 message:"Success ✅",
-                data: findUser,
+                data: findTeacher,
                 accessToken,
                 refreshToken
             });
@@ -107,9 +115,9 @@ class UserController {
             if(!isValidObjectId(id)) {
                 throw new requset_errors("id hato beildi",400, "CONTROLLER");
             }
-            const findUser = await this.#_service.findUser({_id:id});
-            if(!findUser) {
-                throw new requset_errors("munaqa user yoq",404, "CONTROLLER"); 
+            const findTeacher = await this.#_service.findTeacher({_id:id});
+            if(!findTeacher) {
+                throw new requset_errors("munaqa ustoz yoq",404, "CONTROLLER"); 
             }
             const cheking = {
                 name,
@@ -120,27 +128,28 @@ class UserController {
                 Object.entries(cheking).filter(([_, value]) => value !== undefined)
             );
             checked.password = await hash(checked.password,5);
-            const updatedUser = await this.#_service.updateUser(id,checked);
+            const updatedTeacher = await this.#_service.updateTeacher(id,checked);
             res.status(202).send({
                 message: "Success ✅",
-                data:updatedUser,
+                data:updatedTeacher,
             });
         } catch (error) {
             next(error)
         }
     }
-    deleteUser = async (req,res,next) => {
+    deleteTeacher = async (req,res,next) => {
         try {
             const id = req.id;
+            
             if(!isValidObjectId(id)) {
                 throw new requset_errors("id hato berild",400, "CONTROLLER");
             }
-            const findUser = await this.#_service.findUser({_id:id});
-            if(!findUser) {
-                throw new requset_errors("munaqa user yoq",404, "CONTROLLER"); 
+            const findTeacher = await this.#_service.findTeacher({id});
+            if(!findTeacher) {
+                throw new requset_errors("munaqa ustoz yoq",404, "CONTROLLER"); 
             }
-            await this.#_service.deleteUser(id)
-            await likeModel.deleteMany({user:id});
+            await this.#_service.deleteTeacher(id);
+            await courseModel.deleteMany({teacher:id});
             res.send(204).end();
         } catch (error) {
             next(error)
@@ -149,19 +158,18 @@ class UserController {
     forgotPassword = async (req,res,next) => {
         try {
             const {email} = req.body;
-            const findUser = await this.#_service.findUser({email});
-            if(!findUser) {
+            const findTeacher = await this.#_service.findTeacher({email});
+            if(!findTeacher) {
                 throw new requset_errors("email topilmadi",404,"CONTROLLER");
             }
             const token = crypto.randomBytes(20).toString("hex");
-            findUser.token = token;
-            await findUser.save();
+            findTeacher.token = token;
+            await findTeacher.save();
             sendGmail({
                 to:email,
                 subject: "res password",
                 html: `<p>${token}</p>`,
             })
-            console.log(token);
             res.status(200).send({
                 message: "email tekshiring",
             });
@@ -173,12 +181,12 @@ class UserController {
         try {
             let {password} = req.body;
             const {token} = req.query;
-            const findUser = await this.#_service.findUser({token});
-            if(!findUser) {
+            const findTeacher = await this.#_service.findTeacher({token});
+            if(!findTeacher) {
                 throw new requset_errors("foydalanuvhci topilmadi",404,"CONTROLLER");
             }
             password = await hash(password,5);
-            const resetPassword = await this.#_service.updateUser(findUser._id,{password});
+            const resetPassword = await this.#_service.updateTeacher(findTeacher._id,{password});
             res.status(200).send({
                 message:"✅ qayata login qiling",
                 data: resetPassword,
@@ -188,4 +196,4 @@ class UserController {
         }
     }
 }
-export default new UserController();
+export default new TeacherController();

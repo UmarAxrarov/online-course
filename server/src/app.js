@@ -9,6 +9,8 @@ import { requset_errors } from "./exceptions/requset-errors.js";
 import {join} from "node:path";
 import userRoute from "./modules/user/user.route.js";
 import likeRoute from "./modules/like/like.route.js";
+import teacherRoute from "./modules/teacher/teacher.route.js";
+import courseRoute from "./modules/course/course.route.js";
 // JS
 config();
 const app = express();
@@ -21,9 +23,13 @@ if(process.env.NODE_ENV.trim() === "development") {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
+console.log(join(process.cwd(), "uploads"));
+
 app.use("/uploads", express.static(join(process.cwd(), "uploads")));
 app.use("/user", userRoute);
 app.use("/like",likeRoute);
+app.use("/teacher",teacherRoute);
+app.use("/course",courseRoute);
 app.all("/*splat", (req,_,next) => {
     next(new requset_errors(`Bunday ${req.url} sorov mavjud emas`,404, "REQUEST"));
 })

@@ -16,10 +16,19 @@ function dbSelectUndefinedError(error) {
     }
     return error
 }
+function multerSizeFIleError(error) {
+    if(error.code === "LIMIT_FILE_SIZE") {
+        error.status = 400
+        error.isException = true;
+        error.message = `Ushbu mb juda kop`;
+    }
+    return error
+}
 export const global_errors_middleware = (error,_,res,__) => {
     logger.logger_error.error(error.message)    
     error = dbDubKeyError(error);
     error = dbSelectUndefinedError(error);
+    error = multerSizeFIleError(error);
     if(error.isException) {
         return res.status(error.status).send({
             message: error.message,

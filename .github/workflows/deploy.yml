@@ -24,5 +24,5 @@ jobs:
           cd ${{ secrets.DEPLOY_PATH }}
           git pull origin main
           npm i
-          pm2 restart umar || pm2 start server/src/server.js --name umar
+          pm2 restart uy_ishi_umar_1 || pm2 start server/src/server.js --name uy_ishi_umar_1
         EOF

@@ -14,7 +14,6 @@ Course qoyihs va uni organish
 - Ustoz accaunt tikla olishi kerak.
 - Foydalanuvchi curs kora olishi va uni saqla olishi kerak.
 - Foydalanuvchi saqlangan cursni ochira olishi kerak olishi kerak.
-- Foydalanuvchi curs kora olishi va uni saqla olishi kerak.
 - Ustoz curs kora olishi va qosha olishi kerak.
 - Ustoz curs ochira olishi kerak olishi kerak.
 
@@ -28,16 +27,25 @@ Course qoyihs va uni organish
 1. Foydalanuvchi:
     - id
     - name
-    - email
+    - email (UNIQUE)
     - password
-1. Ustoz:
+    - role
+    - imageUrl
+    - likes
+    - token
+2. Ustoz:
     - id
     - name
     - email
-    - password
-    - tel_number
+    - password (UNIQUE)
+    - tel_number (UNIQUE)
+    - imageUrl
+    - role
+    - courses
+    - token
 4. Course:
     - id
+    - teacher_id
     - video or img
     - title
     - content
@@ -45,13 +53,15 @@ Course qoyihs va uni organish
 5. Likes:
     - id
     - course_id
+    - user_id
 
 /->    Home page
 /login    -> Login
 /register  -> Register
+/update  -> update
 /forgot -> Forgot password
-/reset -> Reset password
 /delete -> delete account
 /profile -> user and teacher
 /profile/likes  -> User likes
 /profile/courses -> Teacher courses
+?query -> reset like curs

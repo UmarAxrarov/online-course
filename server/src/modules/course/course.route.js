@@ -25,4 +25,9 @@ courseRoute
     multerConfig.upload.single("fileUrl"),
     courseController.updateCourse
  )
+ .get("/all",
+   authMiddleware.checkAccessToken(false),
+   authMiddleware.checkRefreshToken(false),
+   courseController.gtAllCourse
+ )
 export default courseRoute;

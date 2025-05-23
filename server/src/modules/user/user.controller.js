@@ -45,7 +45,8 @@ class UserController {
                 throw new requset_errors("munaqa foydalanuvhci bor",409, "CONTROLLER");
             }
             password = await hash(password,5);
-            const newUser = await this.#_service.createUser(name,email,password);
+            const token = crypto.randomBytes(20).toString("hex");
+            const newUser = await this.#_service.createUser(name,email,password,token);
             const accessToken = jwt.sign({id:newUser._id,role:newUser.role}, ACCESS_TOKEN_SECRET, {
                 expiresIn: ACCESS_TOKEN_EXPIRE_TIME,
             })

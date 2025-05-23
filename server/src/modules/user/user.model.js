@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema(
     token: {
       type: mongoose.SchemaTypes.String,
     }
+    
   },
   {
     collection: "users",

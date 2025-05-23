@@ -17,17 +17,14 @@ class UserService {
                 }
             }
         })
-        // const findUser = await this.#_service.findById({_id:id}).populate({
-        //     path: "likes",
-        //     select: "-_id user curs",
-        // })
         return findUser;
-    } // for home
-    createUser = async (name,email,password) => {
+    }
+    createUser = async (name,email,password,token) => {
         const newUser = await this.#_service.create({
             name,
             email,
-            password
+            password,
+            token
         })
         return newUser;
     }

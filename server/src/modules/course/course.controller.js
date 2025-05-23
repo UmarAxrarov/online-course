@@ -4,11 +4,39 @@ import courseService from "./course.service.js";
 import { requset_errors } from "../../exceptions/requset-errors.js";
 import { join } from "node:path";
 import fs from "node:fs";
+import userModel from "../user/user.model.js";
 // JS
 class CourseController {
     #_service;
     constructor() {
         this.#_service = courseService;
+    }
+    gtAllCourse = async (req,res,next) => {
+        try {
+            let {sortColumn,sortY,page, limit} = req.query;
+            const chekingSortColumn = ["count"];
+            if(!chekingSortColumn.includes(sortColumn)) {
+                throw new requset_errors("sortColumn  yoki berilmadi hato berildi",400, "CONTROLLER");
+            }
+            sortY = Number(sortY);
+            page = Number(page);
+            limit = Number(limit);
+            if(isNaN(page) || isNaN(limit) || isNaN(sortY)) {
+                throw new requset_errors("page limit sortY raqam berilmadi",400, "CONTROLLER");
+            }
+            if (![1, -1].includes(sortY)) {
+                throw new requset_errors("sortY 1 yoki -1", 400, "CONTROLLER");
+            }
+            const courses = await this.#_service.getAllCourses(sortColumn,sortY,page,limit);
+            if(!courses) {
+                throw new requset_errors("ERROR COURSES",400, "CONTROLLER");
+            }
+            res.status(200).send({
+                data:courses,
+            });
+        } catch (error) {
+            next(error)   
+        }
     }
     createCourse = async (req,res,next) => {
         try {

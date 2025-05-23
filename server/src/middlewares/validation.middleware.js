@@ -18,18 +18,3 @@ export const validation = (schema) => {
         }
     }
 }
-export const sort = (schema) => {
-    return (req,_,next) => {
-        try {            
-            const {error,value} = schema.validate(req.query);
-            console.log(`sortmiddleware ${value}`);
-            if(error) {
-                throw new requset_errors(error.message, 400,"SORT");
-            }
-            req.query = value;
-            next();
-        } catch (error) {
-            next(error);
-        }
-    } 
-}
